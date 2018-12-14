@@ -12,7 +12,7 @@ const PeerBook = require('peer-book')
 const multibase = require('multibase')
 const CID = require('cids')
 const debug = require('debug')
-const defaultsDeep = require('@nodeutils/defaults-deep')
+const mergeOptions = require('merge-options')
 const EventEmitter = require('events')
 
 const config = require('./config')
@@ -77,7 +77,7 @@ class IPFS extends EventEmitter {
 
     options = config.validate(options || {})
 
-    this._options = defaultsDeep(options, defaults)
+    this._options = mergeOptions(defaults, options)
 
     if (options.init === false) {
       this._options.init = false

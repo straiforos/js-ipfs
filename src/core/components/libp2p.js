@@ -2,8 +2,8 @@
 
 const promisify = require('promisify-es6')
 const get = require('lodash/get')
-const defaultsDeep = require('@nodeutils/defaults-deep')
 const ipnsUtils = require('../ipns/routing/utils')
+const mergeOptions = require('merge-options')
 
 module.exports = function libp2p (self) {
   return {
@@ -62,9 +62,9 @@ module.exports = function libp2p (self) {
               get(opts.config, 'connectionManager', {}))
           }
 
-          const libp2pOptions = defaultsDeep(
-            get(self._options, 'libp2p', {}),
-            libp2pDefaults
+          const libp2pOptions = mergeOptions(
+            libp2pDefaults,
+            get(self._options, 'libp2p', {})
           )
 
           // Required inline to reduce startup time

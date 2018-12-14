@@ -7,7 +7,7 @@ const Multiplex = require('libp2p-mplex')
 const SECIO = require('libp2p-secio')
 const Bootstrap = require('libp2p-bootstrap')
 const libp2p = require('libp2p')
-const defaultsDeep = require('@nodeutils/defaults-deep')
+const mergeOptions = require('merge-options')
 
 class Node extends libp2p {
   constructor (_options) {
@@ -52,7 +52,7 @@ class Node extends libp2p {
       }
     }
 
-    super(defaultsDeep(_options, defaults))
+    super(mergeOptions(defaults, _options))
   }
 }
 
