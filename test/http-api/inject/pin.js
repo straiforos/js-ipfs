@@ -115,7 +115,7 @@ module.exports = (http) => {
       })
     })
 
-    describe('ls', () => {
+    describe.only('ls', () => {
       it('fails on invalid args', done => {
         api.inject({
           method: 'GET',
@@ -156,7 +156,7 @@ module.exports = (http) => {
           url: `/api/v0/pin/ls?type=recursive`
         }, (res) => {
           expect(res.statusCode).to.equal(200)
-          expect(res.result.Keys['QmfGBRT6BbWJd7yUc2uYdaUZJBbnEFvTqehPFoSMQ6wgdr'])
+          expect(res.result.Keys.QmfGBRT6BbWJd7yUc2uYdaUZJBbnEFvTqehPFoSMQ6wgdr)
             .to.deep.eql({ Type: 'recursive' })
           done()
         })

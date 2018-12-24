@@ -1,8 +1,8 @@
 'use strict'
 
 const debug = require('debug')
-const get = require('lodash/get')
-const set = require('lodash/set')
+const get = require('dlv')
+const set = require('just-safe-set')
 const log = debug('jsipfs:http-api:config')
 log.error = debug('jsipfs:http-api:config:error')
 const multipart = require('ipfs-multipart')
@@ -104,8 +104,8 @@ exports.getOrSet = {
         }).code(500)
       }
 
-      const updatedConfig = set(originalConfig, key, value)
-      ipfs.config.replace(updatedConfig, (err) => {
+      set(originalConfig, key, value)
+      ipfs.config.replace(originalConfig, (err) => {
         if (err) {
           log.error(err)
           return reply({

@@ -1,6 +1,5 @@
 'use strict'
 
-const _ = require('lodash')
 const debug = require('debug')
 const log = debug('jsipfs:http-api:pin')
 log.error = debug('jsipfs:http-api:pin:error')
@@ -46,10 +45,10 @@ exports.ls = {
       }
 
       return reply({
-        Keys: _.mapValues(
-          _.keyBy(result, obj => obj.hash),
-          obj => ({ Type: obj.type })
-        )
+        Keys: result.reduce((acc, v) => {
+          acc[v.hash] = { Type: v.type }
+          return acc
+        }, {})
       })
     })
   }

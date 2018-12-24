@@ -3,7 +3,6 @@
 const fs = require('fs')
 const path = require('path')
 const glob = require('glob')
-const sortBy = require('lodash/sortBy')
 const pull = require('pull-stream')
 const paramap = require('pull-paramap')
 const zip = require('pull-zip')
@@ -87,7 +86,8 @@ function addPipeline (index, addStream, list, argv) {
       if (silent) return
       if (quieter) return print(added.pop().hash)
 
-      sortBy(added, 'path')
+      added
+        .sort((a, b) => a.path.localCompare(b.path))
         .reverse()
         .map((file) => {
           const log = [ 'added', file.hash ]
