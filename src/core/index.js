@@ -10,6 +10,7 @@ const multiaddr = require('multiaddr')
 const multihash = require('multihashes')
 const PeerBook = require('peer-book')
 const multibase = require('multibase')
+const multicodec = require('multicodec')
 const CID = require('cids')
 const debug = require('debug')
 const defaultsDeep = require('@nodeutils/defaults-deep')
@@ -26,34 +27,34 @@ const mfsPreload = require('./mfs-preload')
 
 // All known (non-default) IPLD formats
 const IpldFormats = {
-  get 'bitcoin-block' () {
+  get [multicodec.BITCOIN_BOCK] () {
     return require('ipld-bitcoin')
   },
-  get 'eth-account-snapshot' () {
+  get [multicodec.ETH_ACCOUNT_SNAPSHOT] () {
     return require('ipld-ethereum').ethAccountSnapshot
   },
-  get 'eth-block' () {
+  get [multicodec.ETH_BLOCK] () {
     return require('ipld-ethereum').ethBlock
   },
-  get 'eth-block-list' () {
+  get [multicodec.ETH_BLOCK_LIST] () {
     return require('ipld-ethereum').ethBlockList
   },
-  get 'eth-state-trie' () {
+  get [multicodec.ETH_STATE_TRIE] () {
     return require('ipld-ethereum').ethStateTrie
   },
-  get 'eth-storage-trie' () {
+  get [multicodec.ETH_STORAGE_TRIE] () {
     return require('ipld-ethereum').ethStorageTrie
   },
-  get 'eth-tx' () {
+  get [multicodec.ETH_TX] () {
     return require('ipld-ethereum').ethTx
   },
-  get 'eth-tx-trie' () {
+  get [multicodec.ETH_TX_TRIE] () {
     return require('ipld-ethereum').ethTxTrie
   },
-  get 'git-raw' () {
+  get [multicodec.GIT_RAW] () {
     return require('ipld-git')
   },
-  get 'zcash-block' () {
+  get [multicodec.ZCASH_BLOCK] () {
     return require('ipld-zcash')
   }
 }
@@ -117,10 +118,13 @@ class IPFS extends EventEmitter {
     this._blockService = new BlockService(this._repo)
     this._ipld = new Ipld({
       blockService: this._blockService,
-      loadFormat: (codec, callback) => {
+      loadFormat: async (codec) => {
         this.log('Loading IPLD format', codec)
-        if (IpldFormats[codec]) return callback(null, IpldFormats[codec])
-        callback(new Error(`Missing IPLD format "${codec}"`))
+        if (IpldFormats[codec]) {
+          return IpldFormats[codec]
+        } else {
+          throw new Error(`Missing IPLD format "${codec}"`)
+        }
       }
     })
     this._preload = preload(this)

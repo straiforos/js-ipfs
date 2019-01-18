@@ -8,7 +8,7 @@ const CID = require('cids')
 const { cidToString } = require('../../utils/cid')
 
 module.exports = (self) => {
-  return promisify((name, opts, cb) => {
+  return promisify(async (name, opts, cb) => {
     if (typeof opts === 'function') {
       cb = opts
       opts = {}
@@ -34,54 +34,18 @@ module.exports = (self) => {
 
     const path = split.slice(3).join('/')
 
-    resolve(cid, path, (err, cid) => {
-      if (err) return cb(err)
-      if (!cid) return cb(new Error('found non-link at given path'))
-      cb(null, `/ipfs/${cidToString(cid, { base: opts.cidBase })}`)
-    })
-  })
-
-  // Resolve the given CID + path to a CID.
-  function resolve (cid, path, callback) {
+    const results = self._ipld.resolve(cid, path)
     let value
-
-    doUntil(
-      (cb) => {
-        self.block.get(cid, (err, block) => {
-          if (err) return cb(err)
-
-          const r = self._ipld.resolvers[cid.codec]
-
-          if (!r) {
-            return cb(new Error(`No resolver found for codec "${cid.codec}"`))
-          }
-
-          r.resolver.resolve(block.data, path, (err, result) => {
-            if (err) return cb(err)
-            value = result.value
-            path = result.remainderPath
-            cb()
-          })
-        })
-      },
-      () => {
-        const endReached = !path || path === '/'
-
-        if (endReached) {
-          return true
-        }
-
-        if (value) {
-          cid = new CID(value['/'])
-        }
-
-        return false
-      },
-      (err) => {
-        if (err) return callback(err)
-        if (value && value['/']) return callback(null, new CID(value['/']))
-        callback()
+    for await (const result of results) {
+      if (result.remainderPath === '') {
+        value = result.value
+        break
       }
-    )
-  }
+    }
+    if (!CID.isCID(value)) {
+      return cb(new Error('found non-link at given path'))
+    } else {
+      return cb(null, `/ipfs/${cidToString(value, { base: opts.cidBase })}`)
+    }
+  })
 }
