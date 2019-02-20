@@ -159,7 +159,7 @@
     "pull-cat": "^1.1.11",
     "pull-defer": "~0.2.3",
     "pull-file": "^1.1.0",
-    "pull-mplex": "~0.1.0",
+    "pull-mplex": "github:libp2p/pull-mplex#fix/memory",
     "pull-ndjson": "~0.1.1",
     "pull-pushable": "^2.2.0",
     "pull-sort": "^1.0.1",
